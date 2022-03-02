@@ -1,0 +1,11 @@
+.list-qns {
+  list-style-type: none;
+}
+.qns-tab {
+  background-color: dimgray;
+  font-family: 'Roboto';
+  font-size: 25px;
+  color: #ffffff;
+  border-radius: 5px;
+  margin: 5px;
+}
