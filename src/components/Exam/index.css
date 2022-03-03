@@ -85,20 +85,29 @@
 }
 .un-list {
   margin-top: 30px;
+  margin-left: -20px;
 }
 .op-list {
   list-style-type: upper-alpha;
-  font-family: 'Roboto';
-  font-size: 15px;
-  color: darkslategray;
   margin-bottom: 20px;
 }
+.selected {
+  background-color: darkgreen;
+  width: 50%;
+}
 .select-option {
-  background-color: azure;
   color: darkslategray;
   font-family: 'Roboto';
   font-size: 15px;
   border-radius: 5px;
+  border-style: none;
+  height: 30px;
+  width: 50%;
+  background-color: none;
+}
+button:hover {
+  background-color: darkgreen;
+  color: white;
 }
 .h-line {
   border-top: 2px solid black;
@@ -300,3 +309,4 @@
   margin-top: -80px;
   margin-left: 120px;
 }
+
