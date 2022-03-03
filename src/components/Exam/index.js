@@ -119,17 +119,17 @@ const tabs = [
 
 class Exam extends Component {
   state = {
-    index: 1,
-    filterQus: quizData[0].question,
-    option: quizData[0].options,
-    answer: quizData[0].answer,
-    total: 0,
+    index: 0,
+    correct: 0,
+    wrong: 0,
     timeElapsedInSeconds: 1800,
     testFinished: false,
     isTimerRunning: true,
     isCheck: false,
     answered: 0,
     ansReview: 0,
+    notAnsReview: 0,
+    userAns: null,
   }
 
   componentDidMount() {
@@ -169,52 +169,68 @@ class Exam extends Component {
   }
 
   displayQus = id => {
-    const qus = quizData[id].question
-    const op = quizData[id].options
-    const ans = quizData[id].answer
-    this.setState({filterQus: qus, index: id + 1, option: op, answer: ans})
+    this.setState({index: id})
   }
 
   previous = () => {
-    const {index} = this.state
-    const qus = quizData[index].question
-    const op = quizData[index].options
+    const {index, userAns, isCheck} = this.state
+    if (index > 0) {
+      this.setState({
+        index: index - 1,
+        isCheck: false,
+      })
+    }
     const ans = quizData[index].answer
-    this.setState({
-      filterQus: qus,
-      index: index - 1,
-      option: op,
-      answer: ans,
-      isCheck: false,
-    })
+
+    if (isCheck === true) {
+      if (userAns !== 'null') {
+        this.setState(prev => ({ansReview: prev.ansReview + 1}))
+      } else {
+        this.setState(prev => ({notAnsReview: prev.notAnsReview + 1}))
+      }
+    }
+    if (userAns !== 'null') {
+      this.setState(prev => ({answered: prev.answered + 1}))
+      if (userAns === ans) {
+        this.setState(prev => ({correct: prev.correct + 4}))
+      } else {
+        this.setState(prev => ({wrong: prev.wrong - 1}))
+      }
+    }
+    this.setState({userAns: 'null'})
   }
 
   next = () => {
-    const {index} = this.state
-    const qus = quizData[index].question
-    const op = quizData[index].options
+    const {index, userAns, isCheck} = this.state
+    if (index < 14) {
+      this.setState({
+        index: index + 1,
+        isCheck: false,
+      })
+    }
     const ans = quizData[index].answer
-    this.setState({
-      filterQus: qus,
-      index: index + 1,
-      option: op,
-      answer: ans,
-      isCheck: false,
-    })
+    console.log(isCheck)
+    if (isCheck === true) {
+      if (userAns !== 'null') {
+        this.setState(prev => ({ansReview: prev.ansReview + 1}))
+      } else {
+        this.setState(prev => ({notAnsReview: prev.notAnsReview + 1}))
+      }
+    }
+
+    if (userAns !== 'null') {
+      this.setState(prev => ({answered: prev.answered + 1}))
+      if (userAns === ans) {
+        this.setState(prev => ({correct: prev.correct + 4}))
+      } else {
+        this.setState(prev => ({wrong: prev.wrong - 1}))
+      }
+    }
+    this.setState({userAns: 'null'})
   }
 
   checkAnswer = ans => {
-    this.setState(prev => ({answered: prev.answered + 1}))
-    const {isCheck} = this.state
-    if (isCheck === true) {
-      this.setState(prev => ({ansReview: prev.ansReview + 1}))
-    }
-    const {answer} = this.state
-    if (answer === ans) {
-      this.setState(prev => ({total: prev.total + 4}))
-    } else {
-      this.setState(prev => ({total: prev.total - 1}))
-    }
+    this.setState({userAns: ans})
   }
 
   check = () => {
@@ -234,12 +250,14 @@ class Exam extends Component {
   render() {
     const {
       index,
-      filterQus,
-      option,
-      total,
+      correct,
+      wrong,
       testFinished,
       answered,
       ansReview,
+      notAnsReview,
+      isCheck,
+      userAns,
       isTimerRunning,
       timeElapsedInSeconds,
     } = this.state
@@ -252,9 +270,9 @@ class Exam extends Component {
         testFinished: true,
       })
     }
+    const labelClass = isCheck ? 'input-label r' : 'input-label'
     const notAnswered = quizData.length - answered
-    const notAnsReview = quizData.length - ansReview
-
+    const total = correct + wrong
     return (
       <>
         {testFinished ? (
@@ -264,7 +282,7 @@ class Exam extends Component {
               <div className="analyze-container">
                 <div className="mark-container">
                   <p className="total-container">
-                    <spam className="marks">{total}</spam>/90
+                    <spam className="marks">{total}</spam>/{quizData.length * 4}
                   </p>
                 </div>
                 <div className="logo">
@@ -277,7 +295,8 @@ class Exam extends Component {
                   <div className="icon-container">
                     <BsCheckCircle className="logo2" />
                     <p className="display-result">
-                      Total Marks <span className="v">90 M</span>
+                      Total Marks
+                      <span className="v">{quizData.length * 4} M</span>
                     </p>
                   </div>
                   <div className="icon-container">
@@ -325,7 +344,7 @@ class Exam extends Component {
               </div>
               <div className="type-container">
                 <div className="q-container">
-                  <p className="q-number">{index}</p>
+                  <p className="q-number">{index + 1}</p>
                   <p className="ans-type">single Answer Type</p>
                 </div>
                 <div className="review-container">
@@ -335,15 +354,20 @@ class Exam extends Component {
                     className="input"
                     onChange={this.check}
                   />
-                  <label htmlFor="review" className="input-label">
+                  <label htmlFor="review" className={labelClass}>
                     Review Later
                   </label>
                 </div>
               </div>
-              <p className="question">{filterQus}</p>
+              <p className="question">{quizData[index].question}</p>
               <ul className="un-list">
-                {option.map(eachOp => (
-                  <li className="op-list" onChange={this.select}>
+                {quizData[index].options.map(eachOp => (
+                  <li
+                    key={eachOp.id}
+                    className={`op-list  ${
+                      userAns === eachOp ? 'selected' : null
+                    }`}
+                  >
                     <button
                       type="button"
                       className="select-option"
