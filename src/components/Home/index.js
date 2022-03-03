@@ -1,3 +1,4 @@
+
 import {Component} from 'react'
 import {Link} from 'react-router-dom'
 import {BsCalendar} from 'react-icons/bs'
@@ -192,8 +193,10 @@ class Home extends Component {
               </label>
             </div>
             {isCheked ? (
-              <button type="button" className="start a">
-                <Link to="/exam">START EXAM</Link>
+              <button type="button" className="start">
+                <Link to="/exam" className="a">
+                  START EXAM
+                </Link>
               </button>
             ) : (
               <button type="button" className="start">
